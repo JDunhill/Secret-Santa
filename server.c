@@ -123,7 +123,7 @@ int main(void)
             if (!fork()) { // this is the child process
                 close(sockfd); // child doesn't need the listener
                                     
-                    int numbytes = send(new_fd, buffer, sizeof(buffer), 0);
+                    int numbytes = send(new_fd, "Hello World\n", sizeof("Hello World\n"), 0);
                     if (numbytes == -1) {
                         perror("send");
                     }
