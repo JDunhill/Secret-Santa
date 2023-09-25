@@ -39,6 +39,36 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6 *)sa)->sin6_addr);
 }
 
+int receive_int(int *num, int fd)
+{
+    int32_t ret;
+    char *data = (char *)&ret;
+    int left = sizeof(ret);
+    int rc;
+    do
+    {
+        rc = read(fd, data, left);
+        if (rc <= 0)
+        { /* instead of ret */
+            if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
+            {
+                // use select() or epoll() to wait for the socket to be readable again
+            }
+            else if (errno != EINTR)
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            data += rc;
+            left -= rc;
+        }
+    } while (left > 0);
+    *num = ntohl(ret);
+    return *num;
+}
+
 int main(void)
 {
     int sockfd, new_fd; // listen on sock_fd, new connection on new_fd
@@ -144,6 +174,10 @@ int main(void)
             close(new_fd);
             exit(0);
         }
+
+        int testing = receive_int(testing, sockfd);
+        printf("RECIEVED %d From client \n", testing);
+
         close(new_fd); // parent doesn't need this
     }
 

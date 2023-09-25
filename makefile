@@ -1,21 +1,25 @@
 CC:= gcc
-CFLAGS:= -o
+CFLAGS:= -c
 
-all: final
+all: clientfinal serverfinal
 
-final: client.o server.o	
+clientfinal: client.o	
+	@echo "Compiling program"
+	$(CC) client.o -o clientfinal
+
+serverfinal: server.o	
 	echo "Compiling program"
-	$(CC) $(CFLAGS) client.o server.o -o final
+	$(CC) server.o -o serverfinal
 
 
 client.o: client.c 
-	echo "Compiling Client" 
-	$(CC) $(CFLAGS) client client.c
+	@echo "Compiling Client" 
+	$(CC) $(CFLAGS) client.c
 
 server.o: server.c 
-	echo "Compiling Server" 
-	$(CC) $(CFLAGS) server server.c
+	@echo "Compiling Server" 
+	$(CC) $(CFLAGS) server.c
 
 clean: 
-	echo "removing everything"
-	rm server.o client.o final
+	@echo "removing everything"
+	rm a.out client server.o client.o serverfinal clientfinal
