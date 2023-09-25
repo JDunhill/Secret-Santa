@@ -17,6 +17,9 @@
 #define BACKLOG 10   // how many pending connections queue will hold
 #define MAX_SIZE 100
 
+size_t used_buffer_bytes = 0;
+char buf[MAX_SIZE];
+
 void sigchld_handler(int s)
 {
     // waitpid() might overwrite errno, so we save and restore it:
@@ -36,6 +39,38 @@ void *get_in_addr(struct sockaddr *sa)
     }
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+void receive_input(int sockfd) 
+{
+    size_t remaining_buffer = MAX_SIZE - used_buffer_bytes;
+    if (remaining_buffer == 0) {
+        printf("Remaining buffer = 0\n");
+        abort();
+    }
+    int numbytes = recv(sockfd, &buf[used_buffer_bytes], remaining_buffer, 0);
+    if (numbytes == 0) {
+        puts("Numbytes = 0");
+        abort();
+    }
+    if (numbytes == -1) {
+        perror("recv");
+        exit(1);
+    }
+    used_buffer_bytes += numbytes;
+    char* start_ptr = buf;
+    char* end_ptr = NULL;
+    
+    while((end_ptr = memchr(start_ptr, '\n', (used_buffer_bytes - (start_ptr - buf)))) != NULL) 
+    {
+        *end_ptr = '\0';
+        printf("Server: received '%s'\n", start_ptr);
+        start_ptr = end_ptr + 1;
+        
+    }
+    used_buffer_bytes -= (start_ptr - buf);
+    memmove(buf, start_ptr, used_buffer_bytes);
+    
 }
 
 int main(void)
@@ -118,15 +153,15 @@ int main(void)
 
         printf("server: got connection from %s\n", s);
         
-        char buffer[MAX_SIZE];
-        
             if (!fork()) { // this is the child process
                 close(sockfd); // child doesn't need the listener
-                                    
-                    int numbytes = send(new_fd, "Hello World\n", sizeof("Hello World\n"), 0);
-                    if (numbytes == -1) {
+
+                    int numbytes_sent = send(new_fd, "Hello World\n", sizeof("Hello World\n"), 0);
+                    if (numbytes_sent == -1) {
                         perror("send");
                     }
+                    receive_input(new_fd);
+                    
                 
                     
                 
