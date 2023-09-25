@@ -48,23 +48,24 @@ int receive_int(int *num, int fd)
     do
     {
         rc = read(fd, data, left);
-        if (rc <= 0)
-        { /* instead of ret */
-            if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
-            {
-                // use select() or epoll() to wait for the socket to be readable again
-            }
-            else if (errno != EINTR)
-            {
-                return -1;
-            }
-        }
-        else
-        {
+        // if (rc <= 0)
+        // { /* instead of ret */
+        //     if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
+        //     {
+        //         // use select() or epoll() to wait for the socket to be readable again
+        //     }
+        //     else if (errno != EINTR)
+        //     {
+        //         return -1;
+        //     }
+        // }
+        // else
+        // {
             data += rc;
             left -= rc;
-        }
+        // }
     } while (left > 0);
+    printf("\nNumber of bytes received: %d\n", rc);
     *num = ntohl(ret);
     return *num;
 }
@@ -165,18 +166,16 @@ int main(void)
         {                  // this is the child process
             close(sockfd); // child doesn't need the listener
 
-            int numbytes = send(new_fd, "Hello World\n", sizeof("Hello World\n"), 0);
-            if (numbytes == -1)
-            {
-                perror("send");
+            while(1) {
+            int testing = receive_int(&testing, new_fd);
+            printf("RECIEVED %d From client \n", testing);
             }
-
+        
             close(new_fd);
             exit(0);
         }
 
-        int testing = receive_int(testing, sockfd);
-        printf("RECIEVED %d From client \n", testing);
+        
 
         close(new_fd); // parent doesn't need this
     }

@@ -127,7 +127,8 @@ int main(int argc, char *argv[])
         // receive_input(sockfd);
         printMenu();
         int choice = userChoice();
-        sendInt(choice, sockfd);
+        int numbytes = sendInt(choice, sockfd);
+        printf("\nNumber of bytes sent: %d\n", numbytes);
     }
 
     close(sockfd);
@@ -161,7 +162,7 @@ int userChoice()
     return n;
 }
 
-int sendInt(int *num, int fd)
+int sendInt(int num, int fd)
 {
     int32_t conv = htonl(num);
     char *data = (char *)&conv;
@@ -170,23 +171,23 @@ int sendInt(int *num, int fd)
 
     do
     {
-        rc = read(fd, data, left);
-        if (rc <= 0)
-        { /* instead of ret */
-            if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
-            {
-                // use select() or epoll() to wait for the socket to be readable again
-            }
-            else if (errno != EINTR)
-            {
-                return -1;
-            }
-        }
-        else
-        {
+        rc = write(fd, data, left);
+        // if (rc <= 0)
+        // { /* instead of ret */
+        //     if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
+        //     {
+        //         // use select() or epoll() to wait for the socket to be readable again
+        //     }
+        //     else if (errno != EINTR)
+        //     {
+        //         return -1;
+        //     }
+        // }
+        // else
+        // {
             data += rc;
             left -= rc;
-        }
+        // }
     } while (left > 0);
-    return 0;
+    return rc;
 }
