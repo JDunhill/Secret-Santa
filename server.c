@@ -15,7 +15,12 @@
 #define PORT "3490" // the port users will be connecting to
 
 #define BACKLOG 10 // how many pending connections queue will hold
-#define MAX_SIZE 100
+#define MAX_SIZE 100 // max buffer size for receiving and sending, unless otherwise specified
+
+int add_giftee();
+int draw_names();
+int get_giftee();
+int quit_connection();
 
 void sigchld_handler(int s)
 {
@@ -39,12 +44,15 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6 *)sa)->sin6_addr);
 }
 
+// function for recieving int from server and parsing it
 int receive_int(int *num, int fd)
 {
     int32_t ret;
     char *data = (char *)&ret;
     int left = sizeof(ret);
     int rc;
+    
+    // ensuring the whole message is read
     do
     {
         rc = read(fd, data, left);
@@ -154,6 +162,7 @@ int main(void)
             continue;
         }
 
+        // convert address from binary to text
         inet_ntop(their_addr.ss_family,
                   get_in_addr((struct sockaddr *)&their_addr),
                   s, sizeof s);
@@ -166,9 +175,26 @@ int main(void)
         {                  // this is the child process
             close(sockfd); // child doesn't need the listener
 
+            // while loop to allow for repeated inputs until they terminate their connection
             while(1) {
-            int testing = receive_int(&testing, new_fd);
-            printf("RECIEVED %d From client \n", testing);
+                int user_input = receive_int(&user_input, new_fd);
+                printf("RECIEVED %d From client \n", user_input);
+                switch (user_input) {
+
+                    case 1: 
+                        add_giftee();
+                        break;
+                    case 2: 
+                        draw_names();
+                        break;
+                    case 3:
+                        get_giftee();
+                        break;
+                } 
+                if (user_input == 4) {
+                    quit_connection();
+                    break;
+                }
             }
         
             close(new_fd);
@@ -182,3 +208,25 @@ int main(void)
 
     return 0;
 }
+
+int add_giftee() {
+    printf("\nAdding giftee!\n");
+    return 0;
+}
+
+int draw_names() {
+    printf("\nDrawing names!\n");
+    return 0;
+}
+
+int get_giftee() {
+    printf("\nYour giftee is: \n");
+    return 0;
+}
+
+int quit_connection() {
+    printf("\nTerminating connection!\n");
+    return 0;
+}
+
+
