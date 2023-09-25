@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "server.h"
+
 
 
 
@@ -21,8 +23,8 @@ list_n create_list() {
 void add_to_front(list_n * first, char* name) {
     node_n * new_node;
     new_node = malloc(sizeof(node_n));
-    new_node->name = malloc(sizeof(name));
-    new_node->name = name;
+    new_node->name = malloc(sizeof(name) + 1);
+    strcpy(new_node->name, name);
     new_node->next = first->head;
     first->head = new_node;
 }
