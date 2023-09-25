@@ -11,13 +11,17 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <time.h>
+#include "server.h"
 
 #define PORT "3490" // the port users will be connecting to
 
 #define BACKLOG 10 // how many pending connections queue will hold
 #define MAX_SIZE 100 // max buffer size for receiving and sending, unless otherwise specified
 
-int add_giftee();
+size_t used_buffer_bytes = 0;
+char buf[MAX_SIZE];
+
+int add_giftee(list_n list_start);
 int draw_names();
 int get_giftee();
 int quit_connection();
@@ -76,6 +80,39 @@ int receive_int(int *num, int fd)
     printf("\nNumber of bytes received: %d\n", rc);
     *num = ntohl(ret);
     return *num;
+}
+
+void receive_input(int sockfd)
+{
+    size_t remaining_buffer = MAX_SIZE - used_buffer_bytes;
+    if (remaining_buffer == 0)
+    {
+        printf("Remaining buffer = 0\n");
+        abort();
+    }
+    int numbytes = recv(sockfd, &buf[used_buffer_bytes], remaining_buffer, 0);
+    if (numbytes == 0)
+    {
+        puts("Numbytes = 0");
+        abort();
+    }
+    if (numbytes == -1)
+    {
+        perror("recv");
+        exit(1);
+    }
+    used_buffer_bytes += numbytes;
+    char *start_ptr = buf;
+    char *end_ptr = NULL;
+
+    while ((end_ptr = memchr(start_ptr, '\n', (used_buffer_bytes - (start_ptr - buf)))) != NULL)
+    {
+        *end_ptr = '\0';
+        printf("Server: received '%s'\n", start_ptr);
+        start_ptr = end_ptr + 1;
+    }
+    used_buffer_bytes -= (start_ptr - buf);
+    memmove(buf, start_ptr, used_buffer_bytes);
 }
 
 int main(void)
@@ -170,11 +207,12 @@ int main(void)
         printf("server: got connection from %s\n", s);
 
         char buffer[MAX_SIZE];
+        
 
         if (!fork())
         {                  // this is the child process
             close(sockfd); // child doesn't need the listener
-
+            list_n list_start = create_list();
             // while loop to allow for repeated inputs until they terminate their connection
             while(1) {
                 int user_input = receive_int(&user_input, new_fd);
@@ -182,7 +220,10 @@ int main(void)
                 switch (user_input) {
 
                     case 1: 
-                        add_giftee();
+                        receive_input(new_fd);
+                        
+                        add_giftee(list_start);
+                        print_list(list_start);
                         break;
                     case 2: 
                         draw_names();
@@ -193,6 +234,7 @@ int main(void)
                 } 
                 if (user_input == 4) {
                     quit_connection();
+                    free_list(&list_start);
                     break;
                 }
             }
@@ -205,12 +247,14 @@ int main(void)
 
         close(new_fd); // parent doesn't need this
     }
-
+    
     return 0;
 }
 
-int add_giftee() {
+int add_giftee(list_n list_start) {
     printf("\nAdding giftee!\n");
+    add_to_front(&list_start, &buf);
+    print_list(list_start);
     return 0;
 }
 

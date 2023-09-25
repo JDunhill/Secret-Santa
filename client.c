@@ -129,6 +129,9 @@ int main(int argc, char *argv[])
         int choice = userChoice();
         int numbytes = sendInt(choice, sockfd);
         printf("\nNumber of bytes sent: %d\n", numbytes);
+        getchar();
+        numbytes = write(sockfd, "Jack\n", sizeof("Jack\n"));
+        printf("\nNumber of bytes sent with name: %d\n", numbytes);
     }
 
     close(sockfd);
