@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <time.h>
+#include "userIO.h"
 
 #define PORT "3490" // the port users will be connecting to
 
@@ -61,8 +62,8 @@ int receive_int(int *num, int fd)
         // }
         // else
         // {
-            data += rc;
-            left -= rc;
+        data += rc;
+        left -= rc;
         // }
     } while (left > 0);
     printf("\nNumber of bytes received: %d\n", rc);
@@ -166,16 +167,15 @@ int main(void)
         {                  // this is the child process
             close(sockfd); // child doesn't need the listener
 
-            while(1) {
-            int testing = receive_int(&testing, new_fd);
-            printf("RECIEVED %d From client \n", testing);
+            while (1)
+            {
+                int testing = receive_int(&testing, new_fd);
+                printf("RECIEVED %d From client \n", testing);
             }
-        
+
             close(new_fd);
             exit(0);
         }
-
-        
 
         close(new_fd); // parent doesn't need this
     }

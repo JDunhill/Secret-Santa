@@ -7,12 +7,12 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-
+#include "userIO.h"
 #include <arpa/inet.h>
 
-#define PORT "3490" // the port client will be connecting to
-
+#define PORT "3490"     // the port client will be connecting to
 #define MAXDATASIZE 100 // max number of bytes we can get at once
+#define MENUITEMS 4     // Number of items within the menu
 
 size_t used_buffer_bytes = 0;
 char buf[MAXDATASIZE];
@@ -61,9 +61,10 @@ void receive_input(int sockfd)
     memmove(buf, start_ptr, used_buffer_bytes);
 }
 
-void printMenu();
-int userChoice();
-int sendInt();
+int send_int();
+int get_giftee();
+int add_giftee(int sockfd);
+void menu(int choice, int sockfd);
 
 int main(int argc, char *argv[])
 {
@@ -125,44 +126,62 @@ int main(int argc, char *argv[])
     while (1)
     {
         // receive_input(sockfd);
-        printMenu();
-        int choice = userChoice();
-        int numbytes = sendInt(choice, sockfd);
+        print_menu();
+        int choice = user_choice(MENUITEMS);
+        int numbytes = send_int(choice, sockfd);
         printf("\nNumber of bytes sent: %d\n", numbytes);
+        menu(choice, sockfd);
     }
 
     close(sockfd);
 }
 
-void printMenu()
+// takes the choice of the user and ensures the correct function is called
+void menu(int choice, int sockfd)
 {
-    printf("What would you like to do \n");
-    printf("\t1. Add a name to the Secret Santa list\n");
-    printf("\t2. Draw the names\n");
-    printf("\t3. Quit application\n");
-}
-
-int userChoice()
-{
-    char *end = NULL;
-    char buf[5];
-    long n = 0;
-    printf("Enter an integer:\n");
-    while (fgets(buf, sizeof(buf), stdin))
+    if (choice == 1)
     {
-        n = strtol(buf, &end, 10);
-        if (end == buf || *end != '\n')
-        {
-            printf("Not recognised as an integer. Please enter an integer:\n");
-        }
-        else
-            break;
+        add_giftee(sockfd);
     }
-    printf("You entered %d\n", n);
-    return n;
+    else if (choice == 2)
+    {
+        exit(1);
+        // draw_names();
+    }
+    else if (choice == 3)
+    {
+        exit(1);
+        // get_giftee();
+    }
+    else
+    {
+        exit(1);
+        // quit_program();
+    }
 }
 
-int sendInt(int num, int fd)
+/*
+
+*/
+int add_giftee(int sockfd)
+{
+    printf("Enter how many names you plan to add \n");
+    int choice = user_choice(10);
+    send_int(choice, sockfd); // This will let the server run the for loop
+    for (int i = 0; i < choice; i++)
+    {
+        char name[30];
+        get_user_string(name);
+        int bytes_sent = write(sockfd, name, strlen(name));
+        if (bytes_sent < 0)
+        {
+            perror("ERROR WRITING MESSAGE TO SOCKET");
+        }
+        printf("%d bytes sent to server!\n", bytes_sent);
+    }
+}
+
+int send_int(int num, int fd)
 {
     int32_t conv = htonl(num);
     char *data = (char *)&conv;
@@ -185,8 +204,8 @@ int sendInt(int num, int fd)
         // }
         // else
         // {
-            data += rc;
-            left -= rc;
+        data += rc;
+        left -= rc;
         // }
     } while (left > 0);
     return rc;
