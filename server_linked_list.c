@@ -26,32 +26,34 @@ void add_to_front(list_n * first, char* name) {
     new_node->name = malloc(sizeof(name) + 1);
 
     if(new_node->name == NULL) {
-        strcpy(new_node->name, name);
+        strlcpy(new_node->name, name, sizeof(name + 1));
         new_node->next = NULL;
     } else {
-        strcpy(new_node->name, name);
+        strlcpy(new_node->name, name, sizeof(name + 1));
         new_node->next = first->head;
         first->head = new_node;
 }
 }
 
-void add_to_end(list_n first, char* name) {
-    node_n * current = first.head;
+
+void add_to_end(list_n* first, char* name) {
+    node_n * current = first->head;
     current->name = malloc(sizeof(name) + 1);
-    current->next = malloc(sizeof(node_n));
 
     if(current->name == NULL) {
-        strcpy(current->name, name);
+        strlcpy(current->name, name, sizeof(name + 1));
         current->next = NULL;
+    } else {
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        if ((current->next = malloc(sizeof(node_n))) == NULL) {
+            printf("Malloc node failure\n");
+        }
+        strlcpy(current->name, name, sizeof(name + 1));
+        current->next->next = NULL;
+        printf("\nAdded to end: %s\n", name);
     }
-    while (current->next != NULL) {
-        current = current->next;
-    }
-
-    strcpy(current->name, name);
-    current->next->next = NULL;
-    printf("\nAdded to end: %s", current->next->name);
-
 }
 
 int pop(list_n *first) {
