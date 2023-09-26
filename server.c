@@ -14,10 +14,11 @@
 #include <string.h>
 #include "server.h"
 
+#include "userIO.h"
 
 #define PORT "3490" // the port users will be connecting to
 
-#define BACKLOG 10 // how many pending connections queue will hold
+#define BACKLOG 10   // how many pending connections queue will hold
 #define MAX_SIZE 100 // max buffer size for receiving and sending, unless otherwise specified
 
 size_t used_buffer_bytes = 0;
@@ -61,7 +62,7 @@ int receive_int(int *num, int fd)
     char *data = (char *)&ret;
     int left = sizeof(ret);
     int rc;
-    
+
     // ensuring the whole message is read
     do
     {
@@ -79,8 +80,8 @@ int receive_int(int *num, int fd)
         // }
         // else
         // {
-            data += rc;
-            left -= rc;
+        data += rc;
+        left -= rc;
         // }
     } while (left > 0);
     printf("\nNumber of bytes received: %d\n", rc);
@@ -245,16 +246,17 @@ int main(void)
 
         printf("server: got connection from %s\n", s);
         char buffer[MAX_SIZE];
-        
 
         if (!fork())
         {                  // this is the child process
             close(sockfd); // child doesn't need the listener
             list_n list_start = create_list();
             // while loop to allow for repeated inputs until they terminate their connection
-            while(1) {
+            while (1)
+            {
                 int user_input = receive_int(&user_input, new_fd);
                 printf("RECIEVED %d From client \n", user_input);
+                
                 switch (user_input) {
 
                     case 1: 
@@ -279,39 +281,39 @@ int main(void)
                     break;
                 }
             }
-        
+
             close(new_fd);
             exit(0);
         }
 
-        
-
         close(new_fd); // parent doesn't need this
     }
-    
+
     return 0;
 }
 
-int add_giftee(list_n list_start) {
+int add_giftee(list_n list_start)
+{
     printf("\nAdding giftee!\n");
     add_to_end(&list_start, &name);
     print_list(list_start);
     return 0;
 }
 
-int draw_names() {
+int draw_names()
+{
     printf("\nDrawing names!\n");
     return 0;
 }
 
-int get_giftee() {
+int get_giftee()
+{
     printf("\nYour giftee is: \n");
     return 0;
 }
 
-int quit_connection() {
+int quit_connection()
+{
     printf("\nTerminating connection!\n");
     return 0;
 }
-
-
