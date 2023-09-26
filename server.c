@@ -11,7 +11,9 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <time.h>
+#include <string.h>
 #include "server.h"
+
 
 #define PORT "3490" // the port users will be connecting to
 
@@ -20,6 +22,7 @@
 
 size_t used_buffer_bytes = 0;
 char buf[MAX_SIZE];
+char name[MAX_SIZE];
 
 int add_giftee(list_n list_start);
 int draw_names();
@@ -109,6 +112,7 @@ void receive_input(int sockfd)
     {
         *end_ptr = '\0';
         printf("Server: received '%s'\n", start_ptr);
+        strcpy(name, start_ptr);
         start_ptr = end_ptr + 1;
     }
     used_buffer_bytes -= (start_ptr - buf);
@@ -221,7 +225,7 @@ int main(void)
 
                     case 1: 
                         receive_input(new_fd);
-                        
+                        sleep(2);
                         add_giftee(list_start);
                         print_list(list_start);
                         break;
@@ -253,7 +257,7 @@ int main(void)
 
 int add_giftee(list_n list_start) {
     printf("\nAdding giftee!\n");
-    add_to_front(&list_start, &buf);
+    add_to_front(&list_start, &name);
     print_list(list_start);
     return 0;
 }

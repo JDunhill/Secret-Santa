@@ -14,7 +14,7 @@ list_n create_list() {
         printf("Malloc failed");
     }
 
-    head->name = 1;
+    head->name = NULL;
     head->next = NULL;
     first.head = head;
     return first;
@@ -24,20 +24,33 @@ void add_to_front(list_n * first, char* name) {
     node_n * new_node;
     new_node = malloc(sizeof(node_n));
     new_node->name = malloc(sizeof(name) + 1);
-    strcpy(new_node->name, name);
-    new_node->next = first->head;
-    first->head = new_node;
+
+    if(new_node->name == NULL) {
+        strcpy(new_node->name, name);
+        new_node->next = NULL;
+    } else {
+        strcpy(new_node->name, name);
+        new_node->next = first->head;
+        first->head = new_node;
+}
 }
 
 void add_to_end(list_n first, char* name) {
     node_n * current = first.head;
+    current->name = malloc(sizeof(name) + 1);
+    current->next = malloc(sizeof(node_n));
+
+    if(current->name == NULL) {
+        strcpy(current->name, name);
+        current->next = NULL;
+    }
     while (current->next != NULL) {
         current = current->next;
     }
 
-    current->next = malloc(sizeof(node_n));
-    current->next->name = name;
+    strcpy(current->name, name);
     current->next->next = NULL;
+    printf("\nAdded to end: %s", current->next->name);
 
 }
 
@@ -86,8 +99,8 @@ int remove_by_index(list_n *first, int val) {
 
 void print_list(list_n first) {
     node_n * current = first.head;
-
-    while (current != NULL) {
+    
+    while (current != NULL && current->name != NULL) {
         printf("%s\n", current->name);
         current = current->next;
     }
