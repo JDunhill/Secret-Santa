@@ -224,10 +224,13 @@ int main(void)
                 switch (user_input) {
 
                     case 1: 
-                        receive_input(new_fd);
-                        add_giftee(list_start);
-                        print_list(list_start);
-                        strlcpy(name, "", sizeof(name)); // clearing the name array
+                        user_input = receive_int(&user_input, new_fd);
+                        for (int i = 0; i < user_input; i++) {
+                            receive_input(new_fd);
+                            add_giftee(list_start);
+                            print_list(list_start);
+                            strlcpy(name, "", sizeof(name)); // clearing the name array
+                        }
                         break;
                     case 2: 
                         draw_names();
