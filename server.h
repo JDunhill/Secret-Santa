@@ -16,7 +16,7 @@ list_n create_list();
 
 void add_to_front(list_n * first, char* name);
 
-void add_to_end(list_n first, char* name);
+void add_to_end(list_n* first, char* name);
 
 int pop(list_n * first);
 

@@ -227,7 +227,7 @@ int main(void)
                         receive_input(new_fd);
                         add_giftee(list_start);
                         print_list(list_start);
-                        strlcpy(name, "", sizeof(name));
+                        strlcpy(name, "", sizeof(name)); // clearing the name array
                         break;
                     case 2: 
                         draw_names();
@@ -257,7 +257,7 @@ int main(void)
 
 int add_giftee(list_n list_start) {
     printf("\nAdding giftee!\n");
-    add_to_front(&list_start, &name);
+    add_to_end(&list_start, &name);
     print_list(list_start);
     return 0;
 }
