@@ -26,10 +26,10 @@ void add_to_front(list_n * first, char* name) {
     new_node->name = malloc(sizeof(name) + 1);
 
     if(new_node->name == NULL) {
-        strcpy(new_node->name, name);
+        strlcpy(new_node->name, name, sizeof(name + 1));
         new_node->next = NULL;
     } else {
-        strcpy(new_node->name, name);
+        strlcpy(new_node->name, name, sizeof(name + 1));
         new_node->next = first->head;
         first->head = new_node;
 }
@@ -41,7 +41,7 @@ void add_to_end(list_n first, char* name) {
     current->next = malloc(sizeof(node_n));
 
     if(current->name == NULL) {
-        strcpy(current->name, name);
+        strlcpy(current->name, name, sizeof(name + 1));
         current->next = NULL;
     }
     while (current->next != NULL) {

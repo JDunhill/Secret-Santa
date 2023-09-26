@@ -225,9 +225,9 @@ int main(void)
 
                     case 1: 
                         receive_input(new_fd);
-                        sleep(2);
                         add_giftee(list_start);
                         print_list(list_start);
+                        strlcpy(name, "", sizeof(name));
                         break;
                     case 2: 
                         draw_names();
