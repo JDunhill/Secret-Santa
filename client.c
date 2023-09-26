@@ -62,6 +62,8 @@ void receive_input(int sockfd)
 }
 
 void printMenu();
+int userChoice();
+int sendInt();
 
 int main(int argc, char *argv[])
 {
@@ -119,12 +121,76 @@ int main(int argc, char *argv[])
 
     freeaddrinfo(servinfo); // all done with this structure
 
+    printf("Welcome to Secret Santa \n");
     while (1)
     {
-        receive_input(sockfd);
+        // receive_input(sockfd);
+        printMenu();
+        int choice = userChoice();
+        int numbytes = sendInt(choice, sockfd);
+        printf("\nNumber of bytes sent: %d\n", numbytes);
+        getchar();
+        numbytes = write(sockfd, "Jack\n", sizeof("Jack\n"));
+        printf("\nNumber of bytes sent with name: %d\n", numbytes);
     }
 
     close(sockfd);
 }
 
-void printMenu();
+void printMenu()
+{
+    printf("What would you like to do \n");
+    printf("\t1. Add a name to the Secret Santa list\n");
+    printf("\t2. Draw the names\n");
+    printf("\t3. Quit application\n");
+}
+
+int userChoice()
+{
+    char *end = NULL;
+    char buf[5];
+    long n = 0;
+    printf("Enter an integer:\n");
+    while (fgets(buf, sizeof(buf), stdin))
+    {
+        n = strtol(buf, &end, 10);
+        if (end == buf || *end != '\n')
+        {
+            printf("Not recognised as an integer. Please enter an integer:\n");
+        }
+        else
+            break;
+    }
+    printf("You entered %d\n", n);
+    return n;
+}
+
+int sendInt(int num, int fd)
+{
+    int32_t conv = htonl(num);
+    char *data = (char *)&conv;
+    int left = sizeof(conv);
+    int rc;
+
+    do
+    {
+        rc = write(fd, data, left);
+        // if (rc <= 0)
+        // { /* instead of ret */
+        //     if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
+        //     {
+        //         // use select() or epoll() to wait for the socket to be readable again
+        //     }
+        //     else if (errno != EINTR)
+        //     {
+        //         return -1;
+        //     }
+        // }
+        // else
+        // {
+            data += rc;
+            left -= rc;
+        // }
+    } while (left > 0);
+    return rc;
+}
