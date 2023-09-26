@@ -11,7 +11,6 @@
 #include <arpa/inet.h>
 #include "shared.h"
 
-#define PORT "3490"     // the port client will be connecting to
 #define MAXDATASIZE 100 // max number of bytes we can get at once
 #define MENUITEMS 4     // Number of items within the menu
 
@@ -168,11 +167,14 @@ int add_giftee(int sockfd)
 {
     printf("Enter how many names you plan to add \n");
     int choice = user_choice(10);
-    send_int(choice, sockfd); // This will let the server run the for loop
+     // This will let the server run the for loop
+    int numbytes = send_int(choice, sockfd);
+    printf("\nNumber of giftees added: %d", numbytes);
     for (int i = 0; i < choice; i++)
     {
         char name[30];
         get_user_string(name);
+        strcat(name, "\n");
         int bytes_sent = write(sockfd, name, strlen(name));
         if (bytes_sent < 0)
         {
