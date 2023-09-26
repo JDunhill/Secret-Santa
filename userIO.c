@@ -16,7 +16,7 @@ void print_menu()
 int user_choice(int maxChoice)
 {
     char *end = NULL;
-    char buf[5];
+    char buf[3];
     long n = 0;
     printf("Enter an integer:\n");
     while (fgets(buf, sizeof(buf), stdin))
@@ -32,9 +32,11 @@ int user_choice(int maxChoice)
         }
         else
         {
+            
             break;
         }
     }
+    buf[strlen(buf) - 1] = '\0';
     // printf("You entered %d\n", n); //use for testing
     return n;
 }

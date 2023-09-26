@@ -242,7 +242,7 @@ int main(void)
                         draw_names();
                         break;
                     case 3:
-                        get_giftee();
+                        print_list(head);
                         break;
                 } 
                 if (user_input == 4) {
@@ -266,7 +266,7 @@ int add_giftee(node_n** head)
 {
     printf("\nAdding giftee!\n");
     printf("\nName = %s\n", name);
-    add_to_end(&head, &name);
+    add_to_end(head, &name);
 
     return 0;
 }

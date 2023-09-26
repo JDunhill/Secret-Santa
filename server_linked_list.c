@@ -41,29 +41,25 @@ void add_to_end(node_n** head, char* name) {
     printf("\nin add to end\n");
 
     if(current->name == NULL) {
-        printf("a\n");
+        
         current->name = malloc(sizeof(name) + 1);
         strlcpy(current->name, name, sizeof(name + 1));
         current->next = NULL;
     } else {
-        printf("b\n");
-        while (1) {
-            printf("looping");
+        
+        while (current->next != NULL) {
             current = current->next;
-            if(current->next != NULL) {
-                break;
-            
-            }
         }
         if ((current->next = malloc(sizeof(node_n))) == NULL) {
             printf("Malloc node failure\n");
         }
-        printf("c\n");
-        current->name = malloc(sizeof(name) + 1);
-        strlcpy(current->name, name, sizeof(name + 1));
+        
+        current->next->name = malloc(sizeof(name) + 1);
+        strlcpy(current->next->name, name, sizeof(name + 1));
         current->next->next = NULL;
     
     }
+    printf("\nAdded node: %s", current->name);
 
 }
 
@@ -107,11 +103,11 @@ int pop(node_n **head) {
     if(head == NULL) {
         return -1;
     }
-
-    next_node = **head->next;
+    node_n * current = *head;
+    next_node = current->next;
     ret = sizeof((*head)->name);
     free(head);
-    head = next_node;
+    *head = next_node;
 
     return ret;
 }
@@ -146,12 +142,11 @@ int remove_by_index(node_n **head, int val) {
 void print_list(node_n* head) {
     node_n * current = head;
     printf("\nIn printlist\n");
-    // while (current != NULL && current->name != NULL) {
-    //     printf("Node: %s\n", current->name);
-    //     current = current->next;
-    // }
-    printf("Node: %s\n", current->name);
-    printf("Node: %s\n", current->next->name);
+    while (current != NULL || current->name != NULL) {
+        printf("Node: %s\n", current->name);
+        current = current->next;
+    }
+   
 
 }
 
