@@ -26,15 +26,6 @@ char buf[MAX_SIZE];
 char name[MAX_SIZE];
 const char names[10][MAX_SIZE];
 
-
-
-
-int add_giftee(node_n** head);
-int draw_names(int count);
-int get_giftee();
-int quit_connection();
-
-
 void sigchld_handler(int s)
 {
     // waitpid() might overwrite errno, so we save and restore it:
@@ -112,6 +103,74 @@ void receive_server_input(int sockfd)
     used_buffer_bytes -= (start_ptr - buf);
     memmove(buf, start_ptr, used_buffer_bytes);
 }
+
+int add_giftee(node_n** head)
+{
+    printf("\nAdding giftee!\n");
+    printf("\nName = %s\n", name);
+    // add_to_end(head, &name);
+
+    return 0;
+}
+
+int draw_names(int count)
+{
+    printf("\nDrawing names!\n");
+
+    for (int i = 0; i < count; i++) {
+        printf("Names: %s\n", names[i]);
+    }
+    if (count > 1)
+    {
+        int i;
+        //step through each index of the name array
+        for (i = 0; i < (count - 1); i++)
+        {
+            
+            int swap_index = rand() % (count - 1);
+
+             while (i == swap_index) {
+                swap_index = rand() % count;
+            }
+            
+            if(strcmp(names[i], names[swap_index]) != 0 && strcmp(names[i], names[swap_index]) != 1 && strcmp(names[i], names[swap_index]) != -1) {
+                
+               
+                char temp[MAX_SIZE];
+                printf("temp is %s\n", temp);
+                strcpy(temp, names[i]);
+                strcpy(names[i], names[swap_index]);
+                strcpy(names[swap_index], temp);
+                printf("Assigned %s to %s\n", names[i], names[swap_index]);
+            } else {
+                printf("%s and %s are the same!\n", names[i], names[swap_index]);
+                i--;
+            }
+
+            
+        
+        }
+    }
+    for (int i = 0; i < count; i++) {
+        printf("Random names: %s\n", names[i]);
+    }
+    
+    return 0;
+}
+
+int get_giftee()
+{
+    printf("\nYour giftee is: \n");
+    return 0;
+}
+
+int quit_connection()
+{
+    printf("\nTerminating connection!\n");
+    return 0;
+}
+
+
 
 
 int main(void)
@@ -278,68 +337,3 @@ int main(void)
     return 0;
 }
 
-int add_giftee(node_n** head)
-{
-    printf("\nAdding giftee!\n");
-    printf("\nName = %s\n", name);
-    // add_to_end(head, &name);
-
-    return 0;
-}
-
-int draw_names(int count)
-{
-    printf("\nDrawing names!\n");
-
-    for (int i = 0; i < count; i++) {
-        printf("Names: %s\n", names[i]);
-    }
-    if (count > 1)
-    {
-        int i;
-        //step through each index of the name array
-        for (i = 0; i < (count - 1); i++)
-        {
-            
-            int swap_index = rand() % (count - 1);
-
-             while (i == swap_index) {
-                swap_index = rand() % count;
-            }
-            
-            if(strcmp(names[i], names[swap_index]) != 0 && strcmp(names[i], names[swap_index]) != 1 && strcmp(names[i], names[swap_index]) != -1) {
-                
-               
-                char temp[MAX_SIZE];
-                printf("temp is %s\n", temp);
-                strcpy(temp, names[i]);
-                strcpy(names[i], names[swap_index]);
-                strcpy(names[swap_index], temp);
-                printf("Assigned %s to %s\n", names[i], names[swap_index]);
-            } else {
-                printf("%s and %s are the same!\n", names[i], names[swap_index]);
-                i--;
-            }
-
-            
-        
-        }
-    }
-    for (int i = 0; i < count; i++) {
-        printf("Random names: %s\n", names[i]);
-    }
-    
-    return 0;
-}
-
-int get_giftee()
-{
-    printf("\nYour giftee is: \n");
-    return 0;
-}
-
-int quit_connection()
-{
-    printf("\nTerminating connection!\n");
-    return 0;
-}
