@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
         print_menu();
         int choice = user_choice(MENUITEMS);
         int numbytes = send_int(choice, sockfd);
-        printf("\nNumber of bytes sent: %d\n", numbytes);
+
         menu(choice, sockfd);
     }
 
@@ -104,18 +104,14 @@ void menu(int choice, int sockfd)
     }
     else if (choice == 2)
     {
-<<<<<<< HEAD
-        printf("Draw name activated");
+        printf("===============================================\n");
+        printf("Draw name activated.\n");
+        printf("===============================================\n");
     }
-=======
-        exit(1);
-        // draw_names();
-        }
->>>>>>> 5f0be2a871964042b01218bbe220f64ba3fac72e
     else if (choice == 3)
     {
         // exit(1);
-        get_giftee();
+        get_giftee(sockfd);
     }
     else
     {
@@ -133,7 +129,7 @@ int add_giftee(int sockfd)
     int choice = user_choice(10);
     // This will let the server run the for loop
     int numbytes = send_int(choice, sockfd);
-    printf("\nNumber of giftees added: %d", numbytes);
+    printf("\nNumber of giftees added: %d\n", choice);
     for (int i = 0; i < choice; i++)
     {
         char name[30];
@@ -144,7 +140,7 @@ int add_giftee(int sockfd)
         {
             perror("ERROR WRITING MESSAGE TO SOCKET");
         }
-        printf("%d bytes sent to server!\n", bytes_sent);
+
     }
 }
 int get_giftee(int sockfd)
@@ -158,7 +154,10 @@ int get_giftee(int sockfd)
     {
         perror("ERROR WRITING MESSAGE TO SOCKET");
     }
-    printf("%d bytes sent to server!\n", bytes_sent);
+    client_receive_input(sockfd);
+    printf("===============================================\n");
+    printf("Your giftee is: %s\n", giftee);
+    printf("===============================================\n");
     return 0;
 }
 
@@ -188,7 +187,6 @@ void client_receive_input(int sockfd)
     while ((end_ptr = memchr(start_ptr, '\n', (used_buffer_bytes - (start_ptr - buf)))) != NULL)
     {
         *end_ptr = '\0';
-        printf("client: received '%s'\n", start_ptr);
         strcpy(giftee, start_ptr);
         start_ptr = end_ptr + 1;
     }

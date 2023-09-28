@@ -238,24 +238,31 @@ int main(void)
                     break;
                 }
                 case 2:
-                    printf("Count = %d\n", count);
+                  
                     draw_names(count);
                     break;
                 case 3:
                     receive_server_input(new_fd);
+                   
                     for (int i = 0; i < count - 1; i++)
                     {
                         // look for the name in the array. If is equal to inputted name, give the next name, unless
                         // they are at the end of the array, in which case loop back to the start
-                        if (strcmp(buf, names[i]) == 0)
+                        if (strcmp(name, names[i]) == 0)
                         {
                             if (i != count - 1)
                             {
-                                write(sockfd, names[i + 1], sizeof(names[i + 1]));
+                                
+                                strcat(names[i + 1], "\n");
+                                int numbytes = write(new_fd, names[i + 1], sizeof(name));
+                              
                             }
                             else
                             {
-                                write(sockfd, names[0], sizeof(names[0]));
+                                
+                                strcat(names[0], "\n");
+                                int numbytes = write(new_fd, names[0], sizeof(names[0]));
+                              
                             }
                         }
                     }
@@ -282,7 +289,7 @@ int main(void)
 int add_giftee(node_n **head)
 {
     printf("\nAdding giftee!\n");
-    printf("\nName = %s\n", name);
+
     // add_to_end(head, &name);
 
     return 0;
@@ -292,10 +299,6 @@ int draw_names(int count)
 {
     printf("\nDrawing names!\n");
 
-    for (int i = 0; i < count; i++)
-    {
-        printf("Names: %s\n", names[i]);
-    }
     if (count > 1)
     {
         int i;
@@ -314,23 +317,20 @@ int draw_names(int count)
             {
 
                 char temp[MAX_SIZE];
-                printf("temp is %s\n", temp);
+               
                 strcpy(temp, names[i]);
                 strcpy(names[i], names[swap_index]);
                 strcpy(names[swap_index], temp);
-                printf("Assigned %s to %s\n", names[i], names[swap_index]);
+
             }
             else
             {
-                printf("%s and %s are the same!\n", names[i], names[swap_index]);
+                
                 i--;
             }
         }
     }
-    for (int i = 0; i < count; i++)
-    {
-        printf("Random names: %s\n", names[i]);
-    }
+    printf("Drawing names successful!\n");
 
     return 0;
 }
