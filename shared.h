@@ -1,7 +1,7 @@
 #ifndef __SHARED_H_
 #define __SHARED_H_
 
-#define PORT "3500"     // The port used by the client and server
+#define PORT "3490"     // The port used by the client and server
 #define MAXDATASIZE 100 // Max number of bytes that we can recieve at once
 
 void *get_in_addr(struct sockaddr *sa);
