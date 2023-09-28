@@ -16,55 +16,14 @@
 
 size_t used_buffer_bytes = 0;
 char buf[MAXDATASIZE];
-
-// get sockaddr, IPv4 or IPv6:
-// void *get_in_addr(struct sockaddr *sa)
-// {
-//     if (sa->sa_family == AF_INET)
-//     {
-//         return &(((struct sockaddr_in *)sa)->sin_addr);
-//     }
-
-//     return &(((struct sockaddr_in6 *)sa)->sin6_addr);
-// }
-
-// void receive_input(int sockfd)
-// {
-//     size_t remaining_buffer = MAXDATASIZE - used_buffer_bytes;
-//     if (remaining_buffer == 0)
-//     {
-//         printf("Remaining buffer = 0\n");
-//         abort();
-//     }
-//     int numbytes = recv(sockfd, &buf[used_buffer_bytes], remaining_buffer, 0);
-//     if (numbytes == 0)
-//     {
-//         puts("Numbytes = 0");
-//         abort();
-//     }
-//     if (numbytes == -1)
-//     {
-//         perror("recv");
-//         exit(1);
-//     }
-//     used_buffer_bytes += numbytes;
-//     char *start_ptr = buf;
-//     char *end_ptr = NULL;
-
-//     while ((end_ptr = memchr(start_ptr, '\n', (used_buffer_bytes - (start_ptr - buf)))) != NULL)
-//     {
-//         *end_ptr = '\0';
-//         printf("client: received '%s'\n", start_ptr);
-//         start_ptr = end_ptr + 1;
-//     }
-//     used_buffer_bytes -= (start_ptr - buf);
-//     memmove(buf, start_ptr, used_buffer_bytes);
-// }
+char giftee[MAXDATASIZE];
 
 // int send_int();
 int get_giftee();
 int add_giftee(int sockfd);
+void draw_names();
 void menu(int choice, int sockfd);
+void client_receive_input(int sockfd);
 
 int main(int argc, char *argv[])
 {
@@ -145,13 +104,12 @@ void menu(int choice, int sockfd)
     }
     else if (choice == 2)
     {
-        exit(1);
-        // draw_names();
+        printf("Draw name activated");
     }
     else if (choice == 3)
     {
-        exit(1);
-        // get_giftee();
+        // exit(1);
+        get_giftee();
     }
     else
     {
@@ -167,7 +125,7 @@ int add_giftee(int sockfd)
 {
     printf("Enter how many names you plan to add \n");
     int choice = user_choice(10);
-     // This will let the server run the for loop
+    // This will let the server run the for loop
     int numbytes = send_int(choice, sockfd);
     printf("\nNumber of giftees added: %d", numbytes);
     for (int i = 0; i < choice; i++)
@@ -183,33 +141,51 @@ int add_giftee(int sockfd)
         printf("%d bytes sent to server!\n", bytes_sent);
     }
 }
+int get_giftee(int sockfd)
+{
+    printf("What is your name \n");
+    char name[MAXDATASIZE];
+    get_user_string(name);
+    strcat(name, "\n");
+    int bytes_sent = write(sockfd, name, strlen(name));
+    if (bytes_sent < 0)
+    {
+        perror("ERROR WRITING MESSAGE TO SOCKET");
+    }
+    printf("%d bytes sent to server!\n", bytes_sent);
+    return 0;
+}
 
-// int send_int(int num, int fd)
-// {
-//     int32_t conv = htonl(num);
-//     char *data = (char *)&conv;
-//     int left = sizeof(conv);
-//     int rc;
+void client_receive_input(int sockfd)
+{
+    size_t remaining_buffer = MAXDATASIZE - used_buffer_bytes;
+    if (remaining_buffer == 0)
+    {
+        printf("Remaining buffer = 0\n");
+        abort();
+    }
+    int numbytes = recv(sockfd, &buf[used_buffer_bytes], remaining_buffer, 0);
+    if (numbytes == 0)
+    {
+        puts("Numbytes = 0");
+        abort();
+    }
+    if (numbytes == -1)
+    {
+        perror("recv");
+        exit(1);
+    }
+    used_buffer_bytes += numbytes;
+    char *start_ptr = buf;
+    char *end_ptr = NULL;
 
-//     do
-//     {
-//         rc = write(fd, data, left);
-//         // if (rc <= 0)
-//         // { /* instead of ret */
-//         //     if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
-//         //     {
-//         //         // use select() or epoll() to wait for the socket to be readable again
-//         //     }
-//         //     else if (errno != EINTR)
-//         //     {
-//         //         return -1;
-//         //     }
-//         // }
-//         // else
-//         // {
-//         data += rc;
-//         left -= rc;
-//         // }
-//     } while (left > 0);
-//     return rc;
-// }
+    while ((end_ptr = memchr(start_ptr, '\n', (used_buffer_bytes - (start_ptr - buf)))) != NULL)
+    {
+        *end_ptr = '\0';
+        printf("client: received '%s'\n", start_ptr);
+        strcpy(giftee, start_ptr);
+        start_ptr = end_ptr + 1;
+    }
+    used_buffer_bytes -= (start_ptr - buf);
+    memmove(buf, start_ptr, used_buffer_bytes);
+}

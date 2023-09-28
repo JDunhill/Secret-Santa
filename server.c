@@ -16,7 +16,6 @@
 #include "shared.h"
 #include "userIO.h"
 
-
 #define BACKLOG 10   // how many pending connections queue will hold
 #define MAX_SIZE 100 // max buffer size for receiving and sending, unless otherwise specified
 
@@ -24,11 +23,10 @@ size_t used_buffer_bytes = 0;
 char buf[MAX_SIZE];
 char name[MAX_SIZE];
 
-int add_giftee(node_n** head);
+int add_giftee(node_n **head);
 int draw_names();
 int get_giftee();
 int quit_connection();
-
 
 void sigchld_handler(int s)
 {
@@ -119,7 +117,6 @@ void receive_server_input(int sockfd)
     used_buffer_bytes -= (start_ptr - buf);
     memmove(buf, start_ptr, used_buffer_bytes);
 }
-
 
 int main(void)
 {
@@ -216,36 +213,39 @@ int main(void)
         if (!fork())
         {                  // this is the child process
             close(sockfd); // child doesn't need the listener
-            node_n * head;
+            node_n *head;
             // while loop to allow for repeated inputs until they terminate their connection
             while (1)
             {
                 int user_input = receive_int(&user_input, new_fd);
                 int number_of_giftees;
                 printf("RECIEVED %d From client \n", user_input);
-                
-                switch (user_input) {
 
-                    case 1: 
-                        number_of_giftees = receive_int(&number_of_giftees, new_fd);
-                        printf("User input is: %d\n", number_of_giftees);
-                        for (int i = 0; i < number_of_giftees; i++) {
-                            receive_server_input(new_fd);
-                            add_giftee(&head);
-                            strlcpy(buf, "", sizeof(buf)); // clearing the name array
-                            strlcpy(name, "", sizeof(name));
-                        }
-                        print_list(head);
+                switch (user_input)
+                {
 
-                        break;
-                    case 2: 
-                        draw_names();
-                        break;
-                    case 3:
-                        print_list(head);
-                        break;
-                } 
-                if (user_input == 4) {
+                case 1:
+                    number_of_giftees = receive_int(&number_of_giftees, new_fd);
+                    printf("User input is: %d\n", number_of_giftees);
+                    for (int i = 0; i < number_of_giftees; i++)
+                    {
+                        receive_server_input(new_fd);
+                        add_giftee(&head);
+                        strlcpy(buf, "", sizeof(buf)); // clearing the name array
+                        strlcpy(name, "", sizeof(name));
+                    }
+                    print_list(head);
+
+                    break;
+                case 2:
+                    draw_names();
+                    break;
+                case 3:
+                    print_list(head);
+                    break;
+                }
+                if (user_input == 4)
+                {
                     quit_connection();
                     free_list(head);
                     break;
@@ -262,7 +262,7 @@ int main(void)
     return 0;
 }
 
-int add_giftee(node_n** head)
+int add_giftee(node_n **head)
 {
     printf("\nAdding giftee!\n");
     printf("\nName = %s\n", name);
