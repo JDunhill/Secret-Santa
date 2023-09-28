@@ -22,4 +22,6 @@ void free_list(node_n* head);
 
 void append(node_n** head, char* name);
 
+int count_list(node_n* head);
+
 #endif  

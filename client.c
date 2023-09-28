@@ -104,8 +104,14 @@ void menu(int choice, int sockfd)
     }
     else if (choice == 2)
     {
+<<<<<<< HEAD
         printf("Draw name activated");
     }
+=======
+        exit(1);
+        // draw_names();
+        }
+>>>>>>> 5f0be2a871964042b01218bbe220f64ba3fac72e
     else if (choice == 3)
     {
         // exit(1);

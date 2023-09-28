@@ -22,9 +22,10 @@
 size_t used_buffer_bytes = 0;
 char buf[MAX_SIZE];
 char name[MAX_SIZE];
+const char names[10][MAX_SIZE];
 
 int add_giftee(node_n **head);
-int draw_names();
+int draw_names(int count);
 int get_giftee();
 int quit_connection();
 
@@ -62,22 +63,10 @@ int receive_int(int *num, int fd)
     do
     {
         rc = read(fd, data, left);
-        // if (rc <= 0)
-        // { /* instead of ret */
-        //     if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
-        //     {
-        //         // use select() or epoll() to wait for the socket to be readable again
-        //     }
-        //     else if (errno != EINTR)
-        //     {
-        //         return -1;
-        //     }
-        // }
-        // else
-        // {
+
         data += rc;
         left -= rc;
-        // }
+
     } while (left > 0);
     printf("\nNumber of bytes received: %d\n", rc);
     *num = ntohl(ret);
@@ -209,6 +198,7 @@ int main(void)
 
         printf("server: got connection from %s\n", s);
         char buffer[MAX_SIZE];
+        static int count;
 
         if (!fork())
         {                  // this is the child process
@@ -225,23 +215,50 @@ int main(void)
                 {
 
                 case 1:
+                {
                     number_of_giftees = receive_int(&number_of_giftees, new_fd);
+
                     printf("User input is: %d\n", number_of_giftees);
                     for (int i = 0; i < number_of_giftees; i++)
                     {
                         receive_server_input(new_fd);
                         add_giftee(&head);
+
+                        // make sure we aren't overflowing array
+                        if (count < 10)
+                        {
+                            count++;
+                            strlcpy(names[i], name, sizeof(name));
+                        }
                         strlcpy(buf, "", sizeof(buf)); // clearing the name array
                         strlcpy(name, "", sizeof(name));
                     }
-                    print_list(head);
+                    // print_list(head);
 
                     break;
+                }
                 case 2:
-                    draw_names();
+                    printf("Count = %d\n", count);
+                    draw_names(count);
                     break;
                 case 3:
-                    print_list(head);
+                    receive_server_input(new_fd);
+                    for (int i = 0; i < count - 1; i++)
+                    {
+                        // look for the name in the array. If is equal to inputted name, give the next name, unless
+                        // they are at the end of the array, in which case loop back to the start
+                        if (strcmp(buf, names[i]) == 0)
+                        {
+                            if (i != count - 1)
+                            {
+                                write(sockfd, names[i + 1], sizeof(names[i + 1]));
+                            }
+                            else
+                            {
+                                write(sockfd, names[0], sizeof(names[0]));
+                            }
+                        }
+                    }
                     break;
                 }
                 if (user_input == 4)
@@ -266,14 +283,55 @@ int add_giftee(node_n **head)
 {
     printf("\nAdding giftee!\n");
     printf("\nName = %s\n", name);
-    add_to_end(head, &name);
+    // add_to_end(head, &name);
 
     return 0;
 }
 
-int draw_names()
+int draw_names(int count)
 {
     printf("\nDrawing names!\n");
+
+    for (int i = 0; i < count; i++)
+    {
+        printf("Names: %s\n", names[i]);
+    }
+    if (count > 1)
+    {
+        int i;
+        // step through each index of the name array
+        for (i = 0; i < (count - 1); i++)
+        {
+
+            int swap_index = rand() % (count - 1);
+
+            while (i == swap_index)
+            {
+                swap_index = rand() % count;
+            }
+
+            if (strcmp(names[i], names[swap_index]) != 0 && strcmp(names[i], names[swap_index]) != 1 && strcmp(names[i], names[swap_index]) != -1)
+            {
+
+                char temp[MAX_SIZE];
+                printf("temp is %s\n", temp);
+                strcpy(temp, names[i]);
+                strcpy(names[i], names[swap_index]);
+                strcpy(names[swap_index], temp);
+                printf("Assigned %s to %s\n", names[i], names[swap_index]);
+            }
+            else
+            {
+                printf("%s and %s are the same!\n", names[i], names[swap_index]);
+                i--;
+            }
+        }
+    }
+    for (int i = 0; i < count; i++)
+    {
+        printf("Random names: %s\n", names[i]);
+    }
+
     return 0;
 }
 
