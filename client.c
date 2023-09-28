@@ -147,7 +147,7 @@ void menu(int choice, int sockfd)
     {
         exit(1);
         // draw_names();
-    }
+        }
     else if (choice == 3)
     {
         exit(1);

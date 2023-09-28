@@ -38,7 +38,6 @@ void add_to_front(node_n** head, char* name) {
 
 void add_to_end(node_n** head, char* name) {
     node_n * current = *head;
-    printf("\nin add to end\n");
 
     if(current->name == NULL) {
         
@@ -59,41 +58,10 @@ void add_to_end(node_n** head, char* name) {
         current->next->next = NULL;
     
     }
-    printf("\nAdded node: %s", current->name);
+    
 
 }
 
-void append(node_n** head, char* name)
-{
-    /* 1. allocate node */
-    node_n *current = malloc(sizeof(node_n));
- 
-    node_n *last = *head; /* used in step 5*/
- 
-    /* 2. put in the data */
-    current->name = malloc(sizeof(name) + 1);
-    strlcpy(current->name, name, sizeof(name + 1));
-    printf("\nCurrent name is: %s\n", current->name);
- 
-    /* 3. This new node is going to be the last node, so
-    make next of it as NULL*/
-    current->next = NULL;
- 
-    /* 4. If the Linked List is empty, then make the new
-    * node as head */
-    if (last->next == NULL) {
-        *head = current;
-        return;
-    }
- 
-    /* 5. Else traverse till the last node */
-    while (last->next != NULL)
-        last = last->next;
- 
-    /* 6. Change the next of last node */
-    last->next = current;
-    return;
-}
 
 int pop(node_n **head) {
 
@@ -141,14 +109,30 @@ int remove_by_index(node_n **head, int val) {
 
 void print_list(node_n* head) {
     node_n * current = head;
-    printf("\nIn printlist\n");
-    while (current != NULL || current->name != NULL) {
+    
+    while (current != NULL && current->name != NULL) {
         printf("Node: %s\n", current->name);
         current = current->next;
     }
+
+    printf("\nFinished printing.\n");
    
 
 }
+
+int count_list(node_n* head){
+    node_n * current = head;
+    static int counter = 0;
+    while (current->next != NULL && current->name != NULL) {
+        printf("Node: %s\n", current->name);
+        current = current->next;
+        counter++;
+    }
+    
+    return counter;
+
+}
+
 
 void free_list(node_n* head)
 {
